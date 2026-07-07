@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const Stripe = require("stripe");
-const OpenAI = require("openai");
+const { GoogleGenAI } = require("@google/genai");
 
 dotenv.config();
 
@@ -11,9 +11,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// OpenAI
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+// Gemini AI
+const ai = new GoogleGenAI({
+  apiKey: process.env.GEMINI_API_KEY,
 });
 
 // Stripe
@@ -35,13 +35,13 @@ app.post("/api/chat", async (req, res) => {
       });
     }
 
-    const response = await openai.responses.create({
-      model: "gpt-4.1-mini",
-      input: message,
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: message,
     });
 
     res.json({
-      reply: response.output_text,
+      reply: response.text,
     });
 
   } catch (err) {
